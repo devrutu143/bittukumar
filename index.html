@@ -1,94 +1,604 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bittu Tuition Services</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rutu X AI Oracle</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> 
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+
+    body {
+      font-family: 'Inter', sans-serif;
+      /* Professional Black Background, White Text */
+      background-color: #000000; 
+      color: #ffffff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* AUTH SCREEN STYLES */
+    #auth-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.95);
+      z-index: 100;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: opacity 0.3s ease;
+    }
+    .auth-box {
+      background-color: #111827;
+      border: 1px solid #374151;
+      box-shadow: 0 0 30px rgba(59, 130, 246, 0.2);
+    }
+    /* END AUTH SCREEN STYLES */
+
+
+    #mythical-background {
+      display: none;
+    }
+
+    .chat-container {
+      max-height: calc(100vh - 12rem);
+      overflow-y: auto;
+      scroll-behavior: smooth;
+      padding-right: 1rem;
+    }
+    .chat-container::-webkit-scrollbar { width: 6px; }
+    .chat-container::-webkit-scrollbar-thumb { background-color: #4b5563; border-radius: 3px; }
+    .chat-container::-webkit-scrollbar-track { background: #1f2937; }
+
+    .user-message {
+      background-color: #1f2937;
+      color: #ffffff;
+      border-radius: 1rem 0.5rem 1rem 1rem;
+      box-shadow: none;
+    }
+    .ai-message {
+      background-color: #2c3140;
+      color: #ffffff;
+      border-radius: 0.5rem 1rem 1rem 1rem;
+      box-shadow: none;
+    }
+
+    @keyframes messageEntry {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .chat-message-item { animation: messageEntry 0.2s ease-out; }
+
+    .loader-rune {
+      border: 4px solid #4b5563;
+      border-top: 4px solid #9ca3af;
+      border-radius: 50%;
+      width: 20px; height: 20px;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    #chat-form button { 
+        transition: background-color 0.2s; 
+        background-color: #3b82f6;
+        color: #ffffff;
+    }
+    #chat-form button:hover { 
+        transform: none;
+        box-shadow: none; 
+        background-color: #2563eb;
+    }
+    #user-input {
+      background-color: #1f2937; 
+      color: #ffffff; 
+      border: 1px solid #4b5563;
+      transition: all 0.2s;
+    }
+    #user-input:focus {
+      border-color: #3b82f6; 
+      box-shadow: 0 0 5px rgba(59, 130, 246, 0.5);
+    }
+
+    #server-select {
+      background-color: #1f2937; 
+      color: #ffffff;
+      border: 1px solid #4b5563; 
+      padding: 0.5rem 1rem; 
+      border-radius: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    header {
+        background-color: #111827 !important;
+        border-bottom: 1px solid #374151 !important;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    }
+    h1, header p {
+        color: #ffffff !important;
+        text-shadow: none;
+    }
+    /* Microphone button styling */
+    #voice-button {
+      background-color: transparent;
+      border: none;
+      color: #3b82f6; 
+      padding: 0.75rem;
+      border-radius: 0.5rem;
+      transition: color 0.2s;
+    }
+    #voice-button:hover {
+      color: #2563eb;
+    }
+    /* Style for when recording */
+    #voice-button.recording {
+      color: #ef4444; 
+      animation: pulse 1s infinite;
+    }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7); }
+      70% { box-shadow: 0 0 0 10px rgba(59, 130, 246, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+    }
+  </style>
 </head>
-<body>
-    <header class="hero">
-        <nav class="navbar">
-            <div class="logo">Bittu Tuition</div>
-            <ul class="nav-links">
-                <li><a href="#about"><i class="fas fa-info-circle"></i> About</a></li>
-                <li><a href="#services"><i class="fas fa-book"></i> Services</a></li>
-                <li><a href="#contact"><i class="fas fa-envelope"></i> Contact</a></li>
-            </ul>
-            <div class="hamburger">
-                <i class="fas fa-bars"></i>
-            </div>
-        </nav>
-        <div class="hero-content">
-            <h1 class="animate-slide-in">Welcome to Bittu Tuition Services</h1>
-            <p class="animate-slide-in">Empowering students with knowledge and confidence.</p>
-            <a href="#contact" class="cta-button animate-button">Get in Touch</a>
-        </div>
-    </header>
+<body class="flex flex-col min-h-screen">
+  <div id="mythical-background"></div>
 
-    <section id="about" class="section">
-        <div class="container">
-            <h2 class="animate-fade-in">About Bittu</h2>
-            <div class="about-content">
-                <img src="assets/204835605_592596145464574_6131187454646850308_n.jpg" alt="Bittu Profile" class="profile-photo animate-fade-in">
+  <div id="auth-screen">
+    <div class="auth-box p-8 rounded-xl max-w-sm w-full text-center">
+      <h2 class="text-3xl font-bold mb-6 text-blue-400">Rutu X Login</h2>
+      
+      <form id="auth-form" class="space-y-4">
+        <input type="email" id="auth-email" placeholder="Email" class="w-full p-3 rounded bg-gray-900 border border-gray-700 text-white focus:border-blue-500 focus:outline-none" required />
+        <input type="password" id="auth-password" placeholder="Password" class="w-full p-3 rounded bg-gray-900 border border-gray-700 text-white focus:border-blue-500 focus:outline-none" required />
+        
+        <button type="submit" id="login-button" class="w-full p-3 rounded font-bold bg-blue-600 hover:bg-blue-700 transition">Log In</button>
+      </form>
 
-                <p class="animate-fade-in">This channel is for those students who are facing difficulties in studies. In this channel, I am going to teach Mathematics from Basic to Standard level & for both the Board's (CBSE & ICSE). We also provide crash courses in Physics and Chemistry. We are going to start our online services very soon, and if you want to study offline, we have our coaching classes at A.M Study Centre.</p>
-            </div>
-        </div>
-    </section>
+      <p class="text-gray-400 mt-4 text-sm">
+        <a href="#" id="toggle-signup" class="text-blue-400 hover:text-blue-300 transition">Need an account? Sign Up</a>
+      </p>
+      <div id="auth-message" class="mt-4 text-sm text-red-400 hidden"></div>
+    </div>
+  </div>
+  <header class="bg-gray-900 p-4 sticky top-0 z-10">
+    <h1 class="text-2xl font-bold text-center tracking-wide">
+      Rutu X AI Oracle
+    </h1>
+    <p class="text-center text-sm text-gray-400 italic mt-1">
+      Powered by Gemini AI. I am ready for your query.
+    </p>
+  </header>
 
-    <section id="services" class="section services-section">
-        <div class="container">
-            <h2 class="animate-fade-in">Our Services</h2>
-            <div class="services-grid">
-                <div class="service-card animate-scale-in">
-                    <h3>One-on-One Tutoring</h3>
-                    <p>Personalized sessions tailored to individual learning styles.</p>
-                </div>
-                <div class="service-card animate-scale-in">
-                    <h3>Group Classes</h3>
-                    <p>Interactive group learning for collaborative education.</p>
-                </div>
-                <div class="service-card animate-scale-in">
-                    <h3>Online Sessions</h3>
-                    <p>Flexible virtual tutoring from the comfort of your home.</p>
-                </div>
-            </div>
-        </div>
-    </section>
+  <main class="flex-grow p-4 flex flex-col">
+    <select id="server-select" title="AI Model Selector">
+      <option value="gemini">Gemini AI</option>
+    </select>
 
-    <section id="contact" class="section contact-section">
-        <div class="container">
-            <h2 class="animate-fade-in">Contact Us</h2>
-            <form id="contact-form" class="animate-slide-in">
-                <input type="text" placeholder="Your Name" required>
-                <input type="email" placeholder="Your Email" required>
-                <textarea placeholder="Your Message" required></textarea>
-                <button type="submit" class="animate-button">Send Message</button>
-            </form>
-        </div>
-    </section>
+    <div id="chat-messages" class="chat-container flex flex-col space-y-4 mb-4 flex-grow">
+      </div>
 
-    <footer>
-        <div class="footer-content animate-fade-in">
-            <div class="contact-info">
-                <p><i class="fas fa-map-marker-alt"></i> A.M Study Centre, Daily Market, RKL-769001</p>
-                <p><i class="fas fa-envelope"></i> <a href="mailto:kumarbittu5555@gmail.com">kumarbittu5555@gmail.com</a></p>
-            </div>
-            <div class="social-links">
-                <a href="https://youtube.com/@mathematicswithbittu?si=w8PqtPApDRhMSmM-" target="_blank" rel="noopener noreferrer">
-                    <i class="fab fa-youtube"></i> YouTube
-                </a>
-                <a href="https://www.instagram.com/bittukr199?igsh=dnFjemZlNWg5M2d5" target="_blank" rel="noopener noreferrer">
-                    <i class="fab fa-instagram"></i> Instagram
-                </a>
-            </div>
-        </div>
-        <p>&copy; 2025 Bittu Tuition Services. All rights reserved.</p>
-    </footer>
+    <div id="loading-indicator" class="flex items-center justify-center my-3 hidden">
+      <div class="loader-rune mr-2"></div>
+      <span class="text-gray-400 font-medium text-sm">Processing Request...</span>
+    </div>
 
-    <script src="script.js"></script>
+    <form id="chat-form" class="flex space-x-3 bg-gray-900 p-3 rounded-lg shadow-inner sticky bottom-0">
+      <input type="text" id="user-input" placeholder="Enter your query..." class="flex-grow p-3 rounded-lg focus:outline-none text-base" required />
+      
+      <button type="button" id="voice-button" title="Voice Input">
+          <i class="fas fa-microphone text-xl"></i>
+      </button>
+
+      <button type="submit" class="font-bold py-2 px-4 rounded-lg">Send</button>
+    </form>
+
+    <div id="error-box" class="fixed bottom-20 left-1/2 transform -translate-x-1/2 p-3 rounded text-center bg-red-700 text-white hidden z-20 shadow-lg" role="alert"></div>
+  </main>
+
+  <script type="module">
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-analytics.js";
+    // IMPORT Authentication and Firestore for login and data
+    import { getAuth } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+    import { getFirestore } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyCrlw7zhxGxDJf3OVnhzDgSmde2HsLdxvA",
+      authDomain: "login-process-8e0bf.firebaseapp.com",
+      projectId: "login-process-8e0bf",
+      storageBucket: "login-process-8e0bf.firebasestorage.app",
+      messagingSenderId: "77736675668",
+      appId: "1:77736675668:web:96329982b5f239fa04a0c1",
+      measurementId: "G-XW58SX9S8L"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+
+    // Initialize Firebase Services used by the main script
+    window.auth = getAuth(app);
+    window.db = getFirestore(app);
+    window.app = app; // Expose app instance if needed
+    
+    // NOTE: This file is a module, so variables like 'auth' and 'db' need to be 
+    // attached to the global 'window' object (window.auth, window.db) to be accessible 
+    // by the main <script> below (which is not a module).
+  </script>
+  <script>
+    const chatMessages = document.getElementById("chat-messages");
+    const chatForm = document.getElementById("chat-form");
+    const userInput = document.getElementById("user-input");
+    const loadingIndicator = document.getElementById("loading-indicator");
+    const errorBox = document.getElementById("error-box");
+    const voiceButton = document.getElementById("voice-button");
+    const geminiKey = "AIzaSyAiPoZYXewoLrXeDD3fO8M_d0FByvINi_4";
+
+    // AUTH ELEMENTS
+    const authScreen = document.getElementById("auth-screen");
+    const authForm = document.getElementById("auth-form");
+    const authEmail = document.getElementById("auth-email");
+    const authPassword = document.getElementById("auth-password");
+    const loginButton = document.getElementById("login-button");
+    const toggleSignup = document.getElementById("toggle-signup");
+    const authMessage = document.getElementById("auth-message");
+    let isSigningUp = false;
+    
+    // Current user's UID (will be used by Firebase) or email (for localStorage simulation)
+    let loggedInUser = null; 
+
+    // VOICE ELEMENTS
+    const synth = window.speechSynthesis;
+    let recognition = null; 
+    let femaleVoice = null; 
+    let isVoiceInput = false;
+
+    // --- Core Utility Functions (Unchanged) ---
+
+    function formatText(text) {
+      return text
+        .replace(/\*\*(.*?)\*\*/g, '<strong class="text-blue-300">$1</strong>')
+        .replace(/\*(.*?)\*/g, "<em>$1</em>")
+        .replace(/^\s*-\s*(.*)$/gm, '<div class="flex items-start mt-1"><span class="mr-2 text-gray-500">•</span> $1</div>')
+        .replace(/\n/g, "<br>");
+    }
+
+    function addMessage(text, sender) {
+      const msg = document.createElement("div");
+      msg.className = `flex ${sender === "user" ? "justify-end" : "justify-start"} chat-message-item`;
+      const bubble = document.createElement("div");
+      const maxWidthClass = sender === "ai" ? "md:max-w-3xl" : "md:max-w-xl";
+      bubble.className = `p-3 shadow-md transition duration-200 ${maxWidthClass} ${sender === "user" ? "user-message" : "ai-message"}`;
+      
+      if (sender === "ai") {
+        bubble.innerHTML = `<span class="text-blue-400 font-bold">The Analyst:</span> ${formatText(text)}`;
+      } else {
+        bubble.textContent = text;
+      }
+      
+      msg.appendChild(bubble);
+      chatMessages.appendChild(msg);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function showError(msg, type="red") {
+      errorBox.textContent = msg;
+      errorBox.className = `fixed bottom-20 left-1/2 transform -translate-x-1/2 p-3 rounded text-center text-white z-20 shadow-lg`;
+      if (type === "red") errorBox.classList.add("bg-red-700", "animate-pulse");
+      else errorBox.classList.add("bg-green-600");
+      errorBox.classList.remove("hidden");
+      setTimeout(() => errorBox.classList.add("hidden"), 4000);
+    }
+
+    async function fetchWithRetry(url, options, maxRetries=3) {
+      // ... (fetch logic remains the same)
+      for (let attempt = 0; attempt < maxRetries; attempt++) {
+        try {
+          const response = await fetch(url, options);
+          if (response.status !== 429) return response;
+          await new Promise(r => setTimeout(r, Math.pow(2, attempt)*1000 + Math.random()*1000));
+        } catch(e) {
+          if (attempt === maxRetries - 1) throw e;
+        }
+      }
+      throw new Error("Max retries exceeded for API call.");
+    }
+
+    async function queryGemini(prompt) {
+      // ... (Gemini API logic remains the same)
+      const payload = { contents: [{ parts: [{ text: prompt }] }] };
+      const res = await fetchWithRetry(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${geminiKey}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      if(!res.ok) throw new Error(`Gemini API error: ${res.status} ${res.statusText || ''}`);
+      const data = await res.json();
+      return data.candidates?.[0]?.content?.parts?.[0]?.text || "No response from Gemini.";
+    }
+
+    // --- DATA PERSISTENCE AND AUTHENTICATION ---
+    
+    // NOTE: The functions below currently use localStorage to SIMULATE data saving.
+    // To use the Firebase script added above, you must replace these functions
+    // with calls to Firebase Authentication (for login/signup) and Firestore (for chat history).
+
+    function getStorageKey(email) {
+        return `chatHistory_${email}`;
+    }
+
+    function saveChatHistory(identifier, history) {
+        // *** FIREBASE ACTION: Replace with Firestore setDoc or updateDoc for the user's chat history document. ***
+        try {
+            localStorage.setItem(getStorageKey(identifier), JSON.stringify(history));
+        } catch (e) {
+            console.error("Error saving chat history to localStorage:", e);
+        }
+    }
+
+    function loadChatHistory(identifier) {
+        // *** FIREBASE ACTION: Replace with Firestore getDoc to fetch the user's chat history. ***
+        try {
+            const history = localStorage.getItem(getStorageKey(identifier));
+            return history ? JSON.parse(history) : [];
+        } catch (e) {
+            console.error("Error loading chat history from localStorage:", e);
+            return [];
+        }
+    }
+    
+    function saveUsers(users) {
+        localStorage.setItem('chatUsers', JSON.stringify(users));
+    }
+
+    function loadUsers() {
+        try {
+            const users = localStorage.getItem('chatUsers');
+            return users ? JSON.parse(users) : [];
+        } catch (e) {
+            console.error("Error loading users from localStorage:", e);
+            return [];
+        }
+    }
+
+    function displayAuthMessage(message, isError = true) {
+        authMessage.textContent = message;
+        authMessage.className = `mt-4 text-sm ${isError ? 'text-red-400' : 'text-green-400'}`;
+        authMessage.classList.remove('hidden');
+    }
+
+    toggleSignup.addEventListener('click', (e) => {
+        e.preventDefault();
+        isSigningUp = !isSigningUp;
+        authMessage.classList.add('hidden');
+        if (isSigningUp) {
+            loginButton.textContent = 'Sign Up';
+            toggleSignup.innerHTML = 'Already have an account? Log In';
+        } else {
+            loginButton.textContent = 'Log In';
+            toggleSignup.innerHTML = 'Need an account? Sign Up';
+        }
+        authEmail.value = '';
+        authPassword.value = '';
+    });
+
+    authForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = authEmail.value.trim().toLowerCase();
+        const password = authPassword.value;
+        authMessage.classList.add('hidden');
+
+        // *** FIREBASE ACTION: Replace the entire block below with Firebase Authentication methods. ***
+        // Example: 
+        // if (isSigningUp) {
+        //     createUserWithEmailAndPassword(window.auth, email, password)
+        //       .then((userCredential) => { handleLoginSuccess(userCredential.user.uid); })
+        //       .catch((error) => { displayAuthMessage(error.message); });
+        // } else {
+        //     signInWithEmailAndPassword(window.auth, email, password)
+        //       .then((userCredential) => { handleLoginSuccess(userCredential.user.uid); })
+        //       .catch((error) => { displayAuthMessage(error.message); });
+        // }
+        // *** End Firebase replacement block ***
+
+        let users = loadUsers();
+
+        if (isSigningUp) {
+            if (users.some(u => u.email === email)) {
+                displayAuthMessage("Error: Account already exists.");
+                return;
+            }
+            users.push({ email, password }); 
+            saveUsers(users);
+            displayAuthMessage("Sign Up successful! You are now logged in.", false);
+            handleLoginSuccess(email); // Using email as identifier for simulation
+        } else {
+            const user = users.find(u => u.email === email && u.password === password);
+            if (user) {
+                handleLoginSuccess(email); // Using email as identifier for simulation
+            } else {
+                displayAuthMessage("Error: Invalid email or password.");
+            }
+        }
+    });
+
+    function handleLoginSuccess(identifier) {
+        loggedInUser = identifier; // This will be the UID when using Firebase
+        authScreen.style.opacity = '0';
+        setTimeout(() => {
+            authScreen.style.display = 'none';
+            loadUserChat();
+        }, 300);
+    }
+
+    function loadUserChat() {
+        chatMessages.innerHTML = ''; 
+
+        const history = loadChatHistory(loggedInUser); // identifier is email for now (will be UID)
+        if (history.length > 0) {
+            history.forEach(item => {
+                addMessage(item.text, item.sender);
+            });
+            addMessage(`Welcome back, ${loggedInUser.split('@')[0]}! I've loaded your previous session.`, "ai");
+        } else {
+            addMessage(`Hello! I am the Rutu X AI Analyst. I am ready for your professional inquiry.`, "ai");
+        }
+    }
+
+    function saveMessage(text, sender) {
+        if (!loggedInUser) return;
+        
+        // *** FIREBASE ACTION: Replace with Firestore transaction/update for the user's chat history document. ***
+        
+        const history = loadChatHistory(loggedInUser);
+        history.push({ text, sender });
+        saveChatHistory(loggedInUser, history);
+    }
+
+
+    // --- Voice Functions (Unchanged) ---
+
+    function initializeVoice() {
+        // ... (voice initialization logic)
+      const voices = synth.getVoices();
+      femaleVoice = voices.find(voice => 
+        voice.lang.startsWith('en') && 
+        (voice.name.includes('female') || voice.name.includes('Feminine') || voice.name.includes('Alice') || voice.name.includes('Google US English'))
+      ) || voices.find(voice => voice.lang.startsWith('en') && voice.default);
+      
+      if (!femaleVoice) {
+        console.warn("Could not find a specific female voice. Using default.");
+      }
+    }
+    synth.onvoiceschanged = initializeVoice;
+    if (synth.getVoices().length > 0) {
+        initializeVoice();
+    }
+
+    function speakResponse(text) {
+        // ... (speakResponse logic)
+      if (synth.speaking) synth.cancel();
+      
+      const cleanText = text.replace(/\*\*/g, '').replace(/<br>/g, ' '); 
+      const utterance = new SpeechSynthesisUtterance(cleanText);
+      utterance.voice = femaleVoice;
+      utterance.rate = 0.95; 
+      utterance.pitch = 1.1; 
+      synth.speak(utterance);
+    }
+
+    function startVoiceRecognition() {
+        // ... (startVoiceRecognition logic)
+      if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        showError("Your browser does not support Speech Recognition.", "red");
+        return;
+      }
+      
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      
+      if (recognition && voiceButton.classList.contains('recording')) {
+          recognition.stop();
+          return;
+      }
+
+      recognition = new SpeechRecognition();
+      
+      recognition.lang = 'en-US';
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+      recognition.continuous = false;
+
+      if (synth.speaking) synth.cancel();
+
+      voiceButton.classList.add('recording');
+      userInput.placeholder = "Listening... Speak now.";
+      userInput.disabled = true;
+
+       recognition.onresult = function(event) {
+        const last = event.results.length - 1;
+        const speechResult = event.results[last][0].transcript;
+        userInput.value = speechResult;
+        userInput.disabled = false;
+        
+        isVoiceInput = true;
+        chatForm.dispatchEvent(new Event('submit', { cancelable: true })); 
+      };
+
+      recognition.onend = function() {
+        voiceButton.classList.remove('recording');
+        userInput.placeholder = "Enter your query...";
+        userInput.disabled = false;
+      };
+
+      recognition.onerror = function(event) {
+        voiceButton.classList.remove('recording');
+        userInput.placeholder = "Enter your query...";
+        userInput.disabled = false;
+        showError(`Voice Error: ${event.error}`, "red");
+      };
+
+      try {
+        recognition.start();
+      } catch (e) {
+        console.error("Recognition start error:", e);
+        voiceButton.classList.remove('recording');
+        userInput.placeholder = "Enter your query...";
+        userInput.disabled = false;
+      }
+    }
+
+    // --- Main Submission Logic (Updated to use saveMessage) ---
+
+    voiceButton.addEventListener('click', startVoiceRecognition);
+
+    chatForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const prompt = userInput.value.trim();
+      if(!prompt || !loggedInUser) return;
+
+      const shouldSpeak = isVoiceInput; 
+
+      addMessage(prompt, "user");
+      saveMessage(prompt, "user"); // SAVE USER MESSAGE
+      userInput.value = "";
+      loadingIndicator.classList.remove("hidden");
+
+      if (synth.speaking) synth.cancel();
+
+      try {
+        const responseText = await queryGemini(prompt);
+        
+        addMessage(responseText, "ai");
+        saveMessage(responseText, "ai"); // SAVE AI MESSAGE
+        
+        if (shouldSpeak) {
+            speakResponse(responseText);
+        }
+
+      } catch(err) {
+        console.error("Fetch Error:", err);
+        const errorMsg = `The Analyst Error: Could not connect to the Gemini AI service. (${err.message})`;
+        
+        addMessage(errorMsg, "ai");
+        showError(`API Error: ${err.message}`, "red"); 
+        
+        if (shouldSpeak) {
+            speakResponse("I apologize, I encountered a connection error. Please try asking again.");
+        }
+
+      } finally {
+        loadingIndicator.classList.add("hidden");
+        isVoiceInput = false; 
+      }
+    });
+
+  </script>
 </body>
-              </html>
+</html>
